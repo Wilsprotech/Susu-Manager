@@ -41,7 +41,11 @@ class SusuGroup:
         if any(existing.casefold() == clean_name.casefold() for existing in self.members):
             raise SusuError(f"Member '{clean_name}' already exists.")
         # Keep the payout order stable: membership is frozen after activity starts.
-        if self.current_week > 1 or any(self.contributions.values()) or self.payout_history:
+        if self.current_week > 1 or any(
+            paid > 0
+            for week_payments in self.contributions.values()
+            for paid in week_payments.values()
+        ) or self.payout_history:
             raise SusuError("Members cannot be added after week 1 activity has started.")
         self.members.append(clean_name)
         self.contributions.setdefault(self.current_week, {})[clean_name] = Decimal("0.00")
