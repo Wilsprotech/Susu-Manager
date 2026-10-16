@@ -77,6 +77,11 @@ class SusuGroupTests(unittest.TestCase):
         self.assertIn("Ama received GHS 150.00", report)
         self.assertIn("Ama: paid GHS 0.00; owes GHS 50.00", report)
 
+    def test_group_rejects_zero_or_negative_weekly_amount(self):
+        for amount in ("0", "-5.00"):
+            with self.subTest(amount=amount), self.assertRaises(SusuError):
+                SusuGroup.create(amount)
+
     def test_empty_group_cannot_close(self):
         with self.assertRaisesRegex(SusuError, "at least one member"):
             SusuGroup.create("50.00").close_week()
